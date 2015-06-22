@@ -73,6 +73,7 @@
                                             </subviews>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>
+                                        <color key="backgroundColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="bottom" secondItem="Fyc-6G-VpA" secondAttribute="bottom" id="AuI-Pi-Z4C"/>
                                             <constraint firstItem="Fyc-6G-VpA" firstAttribute="top" secondItem="mGE-M4-Bb5" secondAttribute="top" id="Em0-Ux-qeh"/>

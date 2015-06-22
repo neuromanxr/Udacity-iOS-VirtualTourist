@@ -48,6 +48,7 @@ class VTClient: NSObject {
         return Singleton.sharedInstance
     }
     
+    // Photo grab starts here. Get the page from the photos, then get the image in that page
     func getPhotosFromCoordinate(coordinate: CLLocationCoordinate2D, completionHandler: (result: [String: AnyObject]?, error: NSError?) -> Void) {
         
         let parameters = [
@@ -61,17 +62,115 @@ class VTClient: NSObject {
         ]
         taskForGETMethod(parameters, completionHandler: { (result, error) -> Void in
             if let error = error {
-                println("Error in GET call")
+                println("Error in GET call: Get photos from coordinate")
                 completionHandler(result: nil, error: error)
             } else {
-                println("GET call succcess \(result)")
+                println("GET call succcess")
+
+                // get a random page
+                let randomPage = self.getRandomPageNumberFromDictionary(result)
                 
-//                completionHandler(result: result, error: nil)
+                // get images from page
+                self.getImageWithPage(parameters, pageNumber: randomPage, completionHandler: { (result, error) -> Void in
+                    if let error = error {
+                        println("Error in getImageWithPage call")
+                        completionHandler(result: nil, error: error)
+                    } else {
+                        println("Success in getImageWithPage call")
+                        completionHandler(result: result, error: nil)
+                    }
+                })
             }
         })
     }
     
+    // Helper - get a random page number
+    func getRandomPageNumberFromDictionary(result: AnyObject!) -> Int {
+        if let photosDictionary = result.valueForKey("photos") as? [String:AnyObject] {
+            
+            if let totalPages = photosDictionary["pages"] as? Int {
+                
+                /* Flickr API - will only return up the 4000 images (100 per page * 40 page max) */
+                let pageLimit = min(totalPages, 40)
+                let randomPage = Int(arc4random_uniform(UInt32(pageLimit))) + 1
+                
+                return randomPage
+                
+            } else {
+                println("Cant find key 'pages' in \(photosDictionary)")
+            }
+        } else {
+            println("Cant find key 'photos' in \(result)")
+        }
+        return 0
+    }
+    
     /* Function makes first request to get a random page, then it makes a request to get an image with the random page */
+    func getImageWithPage(methodArguments: [String : AnyObject], pageNumber: Int, completionHandler: (result: [String: AnyObject]?, error: NSError?) -> Void) {
+        
+        /* Add the page to the method's arguments */
+        var withPageDictionary = methodArguments
+        withPageDictionary["page"] = pageNumber
+        
+        taskForGETMethod(withPageDictionary, completionHandler: { (result, error) -> Void in
+            if let error = error {
+                println("Error in GET call: Get image from page")
+                completionHandler(result: nil, error: error)
+            } else {
+                println("Success in GET call: Get image from page")
+//                completionHandler(result: result, error: nil)
+                let photosArray = self.parsePhotoDictionary(result)
+                // TODO: pass photos array to completion
+            }
+        })
+    }
+    
+    // Helper - create the array of [Photo]
+    func parsePhotoDictionary(result: AnyObject!) -> [[String: AnyObject]] {
+        if let photosDictionary = result["photos"] as? [String:AnyObject] {
+            
+            var totalPhotosVal = 0
+            if let totalPhotos = photosDictionary["total"] as? String {
+                totalPhotosVal = (totalPhotos as NSString).integerValue
+            }
+            
+            if totalPhotosVal > 0 {
+                if let photosArray = photosDictionary["photo"] as? [[String: AnyObject]] {
+                    println("Photos Array: \(photosArray.count)")
+                    
+                    let randomPhotoIndex = Int(arc4random_uniform(UInt32(photosArray.count)))
+                    let photoDictionary = photosArray[randomPhotoIndex] as [String: AnyObject]
+                    // TODO: testing. return array of photos?
+                    let photoTitle = photoDictionary["title"] as? String
+                    let imageUrlString = photoDictionary["url_m"] as? String
+                    let imageURL = NSURL(string: imageUrlString!)
+                    
+                    if let imageData = NSData(contentsOfURL: imageURL!) {
+                        
+                        let dictionary: [String: AnyObject] = [Photo.Keys.Image: imageData, Photo.Keys.Link: imageUrlString!, Photo.Keys.InAlbum: true]
+                        
+                        let photo = Photo(dictionary: dictionary, context: CoreDataStackManager.sharedInstance().managedObjectContext!)
+                        println("Photo Test: \(photo)")
+                        let image = UIImage(data: imageData)
+                        CoreDataStackManager.sharedInstance().saveContext()
+                        
+                        
+                    } else {
+                        println("Image does not exist at \(imageURL)")
+                    }
+                } else {
+                    println("Cant find key 'photo' in \(photosDictionary)")
+                }
+            } else {
+
+            }
+        } else {
+            println("Cant find key 'photos' in \(result)")
+        }
+        return [[String: AnyObject]]()
+    }
+    
+    // Generic GET method
     func taskForGETMethod(parameters: [String : AnyObject], completionHandler: (result: AnyObject!, error: NSError?) -> Void) {
         
         let session = NSURLSession.sharedSession()
@@ -87,31 +186,12 @@ class VTClient: NSObject {
             } else {
                 
                 VTClient.parseJSONWithCompletionHandler(data, completionHandler: completionHandler)
-                
-                var parsingError: NSError? = nil
-                let parsedResult = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.AllowFragments, error: &parsingError) as! NSDictionary
-                
-                if let photosDictionary = parsedResult.valueForKey("photos") as? [String:AnyObject] {
-                    
-                    if let totalPages = photosDictionary["pages"] as? Int {
-                        
-                        /* Flickr API - will only return up the 4000 images (100 per page * 40 page max) */
-                        let pageLimit = min(totalPages, 40)
-                        let randomPage = Int(arc4random_uniform(UInt32(pageLimit))) + 1
-//                        self.getImageFromFlickrBySearchWithPage(methodArguments, pageNumber: randomPage)
-                        
-                    } else {
-                        println("Cant find key 'pages' in \(photosDictionary)")
-                    }
-                } else {
-                    println("Cant find key 'photos' in \(parsedResult)")
-                }
             }
         }
-        
         task.resume()
     }
     
+    // Helper - Make bounding box from coordinates
     func createBoundingBoxString(coordinate: CLLocationCoordinate2D) -> String {
         
         let latitude = coordinate.latitude

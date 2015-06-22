@@ -7,12 +7,13 @@
         <relationship name="photos" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="Photo" inverseName="pin" inverseEntity="Photo" syncable="YES"/>
     </entity>
     <entity name="Photo" representedClassName="Photo" syncable="YES">
+        <attribute name="image" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="inAlbum" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="link" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="pin" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="MapPin" inverseName="photos" inverseEntity="MapPin" syncable="YES"/>
     </entity>
     <elements>
         <element name="MapPin" positionX="-45" positionY="0" width="128" height="105"/>
-        <element name="Photo" positionX="-18" positionY="27" width="128" height="90"/>
+        <element name="Photo" positionX="-18" positionY="27" width="128" height="105"/>
     </elements>
 </model>

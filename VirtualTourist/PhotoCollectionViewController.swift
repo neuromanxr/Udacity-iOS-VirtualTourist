@@ -9,7 +9,7 @@
 import UIKit
 import CoreData
 
-let reuseIdentifier = "Cell"
+let reuseIdentifier = "PhotoCollectionCell"
 
 class PhotoCollectionViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, NSFetchedResultsControllerDelegate {
     
@@ -51,6 +51,16 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
         println("Pin in PhotoCollection: \(self.pin)")
         
         self.fetchPhotos()
+        
+        // Start the fetched results controller
+        var error: NSError?
+        fetchedResultsController.performFetch(&error)
+        
+        if let error = error {
+            println("Error performing initial fetch: \(error)")
+        }
+        
+        println("Fetched Objects: \(self.fetchedResultsController.fetchedObjects?.count)")
     }
 
     override func didReceiveMemoryWarning() {
@@ -93,9 +103,10 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
     
     func configureCell(cell: PhotoCollectionViewCell, atIndexPath indexPath: NSIndexPath) {
         
-        let photo = self.fetchedResultsController.objectAtIndexPath(indexPath) as! PhotoCollectionViewCell
-        
-        cell.imageView.image = UIImage(named: "")
+        let photo = self.fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
+        let image = UIImage(data: photo.image)
+        println("Photo in cell: \(UIImage(data: photo.image)))")
+        cell.imageView!.image = image
         
         // If the cell is "selected" it's color panel is grayed out
         // we use the Swift `find` function to see if the indexPath is in the array
@@ -248,7 +259,7 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
             } else {
                 println("Result: \(result)")
                 
-                // TODO: parse result, create Photo object and insert into context. Establish relationship to MapPin
+                // TODO: parse result, create Photo object and insert into context. Establish relationship to selected MapPin
             }
         })
         
