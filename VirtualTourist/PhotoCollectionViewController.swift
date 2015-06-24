@@ -30,6 +30,8 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
     
     @IBOutlet weak var bottomButton: UIBarButtonItem!
     
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    
     var sharedContext: NSManagedObjectContext {
         return CoreDataStackManager.sharedInstance().managedObjectContext!
     }
@@ -40,17 +42,20 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
-        // Register cell classes
-        self.collectionView!.registerClass(PhotoCollectionViewCell.self, forCellWithReuseIdentifier: reuseIdentifier)
-
         // Do any additional setup after loading the view.
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Done, target: self, action: "dismiss")
         
+        // Navigation Buttons
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Done, target: self, action: "dismiss")
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Cancel, target: self, action: "dismiss")
         
-        println("Pin in PhotoCollection: \(self.pin)")
+        // Bottom Button
+        self.bottomButton.enabled = false
+        self.bottomButton.title = "New Collection"
         
-        self.fetchPhotos()
+        // Start activity indicator
+        self.activityIndicator.startAnimating()
+        
+        println("Pin in PhotoCollection: \(self.pin)")
         
         // Start the fetched results controller
         var error: NSError?
@@ -61,6 +66,16 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
         }
         
         println("Fetched Objects: \(self.fetchedResultsController.fetchedObjects?.count)")
+    }
+    
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        
+    }
+    
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+        
     }
 
     override func didReceiveMemoryWarning() {
@@ -84,19 +99,12 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
         layout.itemSize = CGSize(width: width, height: width)
         collectionView.collectionViewLayout = layout
     }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using [segue destinationViewController].
-        // Pass the selected object to the new view controller.
-    }
-    */
     
     func dismiss() {
-        self.dismissViewControllerAnimated(true, completion: nil)
+        self.dismissViewControllerAnimated(true, completion: {
+            
+            CoreDataStackManager.sharedInstance().saveContext()
+        })
     }
     
     // MARK: - Configure Cell
@@ -104,17 +112,61 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
     func configureCell(cell: PhotoCollectionViewCell, atIndexPath indexPath: NSIndexPath) {
         
         let photo = self.fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
-        let image = UIImage(data: photo.image)
-        println("Photo in cell: \(UIImage(data: photo.image)))")
-        cell.imageView!.image = image
+        var cellImage = UIImage(named: "placeholder")
+        println("Pin Image \(cellImage!)")
+        cell.imageView?.image = nil
+        
+        if photo.image != nil {
+            cellImage = photo.image
+        } else {
+            
+            cell.activityIndicator.startAnimating()
+            
+            let task = VTClient.sharedInstance().taskForImage(photo.link!, completionHandler: { (imageData, error) -> Void in
+                if let error = error {
+                    println("Error: taskForImage call")
+
+                } else {
+                    
+                    if let data = imageData {
+                        let image = UIImage(data: data)
+                        photo.image = image
+                        
+                        dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                            cell.activityIndicator.stopAnimating()
+                            cell.imageView?.image = image
+                            photo.isDownloaded = true
+                            
+                            
+                            
+                            self.updateBottomButton()
+                        })
+                    } else {
+                        println("Error: Couldn't get the image data")
+                        
+                    }
+                }
+            })
+            
+            cell.taskToCancelifCellIsReused = task
+        }
+        cell.imageView?.image = cellImage
+        
+        if cell.activityIndicator.isAnimating() {
+            cell.activityIndicator.stopAnimating()
+        }
         
         // If the cell is "selected" it's color panel is grayed out
         // we use the Swift `find` function to see if the indexPath is in the array
         
         if let index = find(selectedIndexes, indexPath) {
-            cell.imageView.alpha = 0.05
+            cell.imageView?.alpha = 0.5
         } else {
-            cell.imageView.alpha = 1.0
+            cell.imageView?.alpha = 1.0
+        }
+        
+        if self.activityIndicator.isAnimating() {
+            self.activityIndicator.stopAnimating()
         }
     }
 
@@ -134,6 +186,7 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
     }
 
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
+        
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier, forIndexPath: indexPath) as! PhotoCollectionViewCell
     
         // Configure the cell
@@ -166,7 +219,7 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
         
         let fetchRequest = NSFetchRequest(entityName: "Photo")
         fetchRequest.sortDescriptors = []
-        
+        fetchRequest.predicate = NSPredicate(format: "pin == %@", self.pin)
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.sharedContext, sectionNameKeyPath: nil, cacheName: nil)
         fetchedResultsController.delegate = self
         
@@ -243,7 +296,8 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
             }
             
             for indexPath in self.updatedIndexPaths {
-                self.collectionView.reloadItemsAtIndexPaths([indexPath])
+                // TODO: Causes infinite loop with photo.isDownloaded
+//                self.collectionView.reloadItemsAtIndexPaths([indexPath])
             }
             
             }, completion: nil)
@@ -251,27 +305,50 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
     
     // MARK: - Actions and Helpers
     
-    func fetchPhotos() {
+    func getNewPhotoCollection() {
         
-        VTClient.sharedInstance().getPhotosFromCoordinate(pin.coordinate, completionHandler: { (result, error) -> Void in
-            if let error = error {
-                println("Error: In MapView")
-            } else {
-                println("Result: \(result)")
-                
-                // TODO: parse result, create Photo object and insert into context. Establish relationship to selected MapPin
-            }
-        })
-        
-//        CoreDataStackManager.sharedInstance().saveContext()
+        self.activityIndicator.startAnimating()
+        println("Get New: \(pin.photos.count)")
+        if pin.photos.isEmpty {
+            
+            VTClient.sharedInstance().getPhotosFromCoordinate(pin.coordinate, completionHandler: { (result, error) -> Void in
+                if let error = error {
+                    println("Error: In MapView")
+                } else {
+                    println("Result: \(result)")
+                    
+                    // TODO: parse result, create Photo object and insert into context. Establish relationship to selected MapPin
+                    let photosArray = result!
+                    var photos = photosArray.map() { (dictionary: [String : AnyObject]) -> Photo in
+                        let photo = Photo(dictionary: dictionary, context: self.sharedContext)
+                        // establish relationship with photo to selected pin
+                        photo.pin = self.pin
+                        
+                        
+                        return photo
+                    }
+                    
+                }
+            })
+            CoreDataStackManager.sharedInstance().saveContext()
+        }
+        if self.activityIndicator.isAnimating() {
+            self.activityIndicator.stopAnimating()
+        }
     }
+    
     
     @IBAction func bottomButtonTapped() {
         
         if selectedIndexes.isEmpty {
+            
             deleteAllPhotos()
+            bottomButton.enabled = false
+            getNewPhotoCollection()
+            
         } else {
             deleteSelectedPhotos()
+            
         }
     }
     
@@ -280,6 +357,7 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
         for photo in fetchedResultsController.fetchedObjects as! [Photo] {
             sharedContext.deleteObject(photo)
         }
+        CoreDataStackManager.sharedInstance().saveContext()
     }
     
     func deleteSelectedPhotos() {
@@ -296,11 +374,29 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
         selectedIndexes = [NSIndexPath]()
     }
     
+    func checkPhotosIsDownloaded() {
+        let photos = fetchedResultsController.fetchedObjects as! [Photo]
+        // array of photos where isDownloaded property is false
+        let photosNotDownloaded = photos.filter {
+            $0.isDownloaded == false
+        }
+        // there are photos not finished downloading
+        if photosNotDownloaded.count > 0 {
+            // disable the New Collection button
+            bottomButton.enabled = false
+        } else {
+            // all photos are finished downloading
+            bottomButton.enabled = true
+        }
+    }
+    
     func updateBottomButton() {
         if selectedIndexes.count > 0 {
             bottomButton.title = "Remove Selected Photos"
         } else {
-            bottomButton.title = "Clear All"
+            bottomButton.title = "New Collection"
+            
+            checkPhotosIsDownloaded()
         }
     }
 

@@ -23,6 +23,7 @@ class MapPin: NSManagedObject, MKAnnotation {
     @NSManaged var title: String
     @NSManaged var latitude: NSNumber
     @NSManaged var longitude: NSNumber
+    @NSManaged var photos: [Photo]
     
     var coordinate: CLLocationCoordinate2D {
         get {

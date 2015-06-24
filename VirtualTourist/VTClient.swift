@@ -19,6 +19,7 @@ class VTClient: NSObject {
         static let SAFE_SEARCH = "1"
         static let DATA_FORMAT = "json"
         static let NO_JSON_CALLBACK = "1"
+        static let PER_PAGE = "21"
         
         static let BOUNDING_BOX_HALF_WIDTH = 1.0
         static let BOUNDING_BOX_HALF_HEIGHT = 1.0
@@ -49,7 +50,7 @@ class VTClient: NSObject {
     }
     
     // Photo grab starts here. Get the page from the photos, then get the image in that page
-    func getPhotosFromCoordinate(coordinate: CLLocationCoordinate2D, completionHandler: (result: [String: AnyObject]?, error: NSError?) -> Void) {
+    func getPhotosFromCoordinate(coordinate: CLLocationCoordinate2D, completionHandler: (result: [[String: AnyObject]]?, error: NSError?) -> Void) {
         
         let parameters = [
             "method": Flickr.METHOD_NAME,
@@ -58,7 +59,8 @@ class VTClient: NSObject {
             "safe_search": Flickr.SAFE_SEARCH,
             "extras": Flickr.EXTRAS,
             "format": Flickr.DATA_FORMAT,
-            "nojsoncallback": Flickr.NO_JSON_CALLBACK
+            "nojsoncallback": Flickr.NO_JSON_CALLBACK,
+            "per_page": Flickr.PER_PAGE
         ]
         taskForGETMethod(parameters, completionHandler: { (result, error) -> Void in
             if let error = error {
@@ -106,23 +108,24 @@ class VTClient: NSObject {
     }
     
     /* Function makes first request to get a random page, then it makes a request to get an image with the random page */
-    func getImageWithPage(methodArguments: [String : AnyObject], pageNumber: Int, completionHandler: (result: [String: AnyObject]?, error: NSError?) -> Void) {
+    func getImageWithPage(methodArguments: [String : AnyObject], pageNumber: Int, completionHandler: (result: [[String: AnyObject]]?, error: NSError?) -> Void) -> NSURLSessionDataTask {
         
         /* Add the page to the method's arguments */
         var withPageDictionary = methodArguments
         withPageDictionary["page"] = pageNumber
         
-        taskForGETMethod(withPageDictionary, completionHandler: { (result, error) -> Void in
+        let task = taskForGETMethod(withPageDictionary, completionHandler: { (result, error) -> Void in
             if let error = error {
                 println("Error in GET call: Get image from page")
                 completionHandler(result: nil, error: error)
             } else {
                 println("Success in GET call: Get image from page")
-//                completionHandler(result: result, error: nil)
                 let photosArray = self.parsePhotoDictionary(result)
                 // TODO: pass photos array to completion
+                completionHandler(result: photosArray, error: nil)
             }
         })
+        return task
     }
     
     // Helper - create the array of [Photo]
@@ -138,31 +141,13 @@ class VTClient: NSObject {
                 if let photosArray = photosDictionary["photo"] as? [[String: AnyObject]] {
                     println("Photos Array: \(photosArray.count)")
                     
-                    let randomPhotoIndex = Int(arc4random_uniform(UInt32(photosArray.count)))
-                    let photoDictionary = photosArray[randomPhotoIndex] as [String: AnyObject]
-                    // TODO: testing. return array of photos?
-                    let photoTitle = photoDictionary["title"] as? String
-                    let imageUrlString = photoDictionary["url_m"] as? String
-                    let imageURL = NSURL(string: imageUrlString!)
+                    return photosArray
                     
-                    if let imageData = NSData(contentsOfURL: imageURL!) {
-                        
-                        let dictionary: [String: AnyObject] = [Photo.Keys.Image: imageData, Photo.Keys.Link: imageUrlString!, Photo.Keys.InAlbum: true]
-                        
-                        let photo = Photo(dictionary: dictionary, context: CoreDataStackManager.sharedInstance().managedObjectContext!)
-                        println("Photo Test: \(photo)")
-                        let image = UIImage(data: imageData)
-                        CoreDataStackManager.sharedInstance().saveContext()
-                        
-                        
-                    } else {
-                        println("Image does not exist at \(imageURL)")
-                    }
                 } else {
                     println("Cant find key 'photo' in \(photosDictionary)")
                 }
             } else {
-
+                println("There's no photos")
             }
         } else {
             println("Cant find key 'photos' in \(result)")
@@ -170,8 +155,30 @@ class VTClient: NSObject {
         return [[String: AnyObject]]()
     }
     
+    func taskForImage(filePath: String, completionHandler: (imageData: NSData?, error: NSError?) -> Void) -> NSURLSessionTask {
+        
+        // Flickr image URL
+        let url = NSURL(string: filePath)!
+        let request = NSURLRequest(URL: url)
+        
+        // Make the request
+        let task = session.dataTaskWithRequest(request) {
+            data, response, downloadError in
+            
+            if let error = downloadError {
+                let newError = VTClient.errorForData(data, response: response, error: error)
+                completionHandler(imageData: data, error: newError)
+            } else {
+                completionHandler(imageData: data, error: nil)
+            }
+        }
+        task.resume()
+        
+        return task
+    }
+    
     // Generic GET method
-    func taskForGETMethod(parameters: [String : AnyObject], completionHandler: (result: AnyObject!, error: NSError?) -> Void) {
+    func taskForGETMethod(parameters: [String : AnyObject], completionHandler: (result: AnyObject!, error: NSError?) -> Void) -> NSURLSessionDataTask {
         
         let session = NSURLSession.sharedSession()
         let urlString = Flickr.BASE_URL + VTClient.escapedParameters(parameters)
@@ -189,6 +196,8 @@ class VTClient: NSObject {
             }
         }
         task.resume()
+        
+        return task
     }
     
     // Helper - Make bounding box from coordinates
@@ -255,5 +264,9 @@ class VTClient: NSObject {
         }
         
         return (!urlVars.isEmpty ? "?" : "") + join("&", urlVars)
+    }
+    
+    struct Caches {
+        static let imageCache = ImageCache()
     }
 }

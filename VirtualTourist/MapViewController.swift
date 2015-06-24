@@ -27,6 +27,8 @@ class MapViewController: UIViewController {
         // Do any additional setup after loading the view, typically from a nib.
         self.fetchAllMapPins()
         
+        self.loadMapDefaults()
+        
         self.mapView.delegate = self
     }
     
@@ -39,10 +41,6 @@ class MapViewController: UIViewController {
         super.viewDidAppear(animated)
         
         self.addGestureRecognizer()
-        
-        dispatch_async(dispatch_get_main_queue(), { () -> Void in
-            self.loadMapDefaults()
-        })
     }
     
     override func viewDidDisappear(animated: Bool) {
@@ -76,11 +74,12 @@ class MapViewController: UIViewController {
             let mapSpanLong = NSUserDefaults.standardUserDefaults().doubleForKey(DefaultMapKeys.spanLong)
             
             let region = MKCoordinateRegionMake(CLLocationCoordinate2DMake(mapCenterLat, mapCenterLong), MKCoordinateSpanMake(mapSpanLat, mapSpanLong))
-            self.mapView.setRegion(region, animated: true)
+            self.mapView.setRegion(region, animated: false)
         } else {
             println("Defaults don't exist")
         }
         
     }
+    
 }
 

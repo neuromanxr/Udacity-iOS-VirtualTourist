@@ -52,9 +52,8 @@
                         <subviews>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="vM7-sh-CyZ">
                                 <rect key="frame" x="0.0" y="195" width="600" height="405"/>
-                                <color key="backgroundColor" red="0.20000000000000001" green="0.40000000000000002" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
-                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="6Av-1Y-sut">
-                                    <size key="itemSize" width="100" height="100"/>
+                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="1" minimumInteritemSpacing="1" id="6Av-1Y-sut">
+                                    <size key="itemSize" width="200" height="200"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                     <size key="footerReferenceSize" width="0.0" height="0.0"/>
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
@@ -64,23 +63,29 @@
                                         <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                            <rect key="frame" x="0.0" y="0.0" width="100" height="100"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="200" height="200"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Fyc-6G-VpA">
-                                                    <rect key="frame" x="0.0" y="0.0" width="100" height="100"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="200" height="200"/>
                                                 </imageView>
+                                                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="auA-gg-bSP">
+                                                    <rect key="frame" x="82" y="81" width="37" height="37"/>
+                                                    <color key="color" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                </activityIndicatorView>
                                             </subviews>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>
-                                        <color key="backgroundColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="bottom" secondItem="Fyc-6G-VpA" secondAttribute="bottom" id="AuI-Pi-Z4C"/>
+                                            <constraint firstItem="auA-gg-bSP" firstAttribute="centerX" secondItem="Fyc-6G-VpA" secondAttribute="centerX" constant="0.5" id="CyJ-Bd-cIh"/>
                                             <constraint firstItem="Fyc-6G-VpA" firstAttribute="top" secondItem="mGE-M4-Bb5" secondAttribute="top" id="Em0-Ux-qeh"/>
                                             <constraint firstItem="Fyc-6G-VpA" firstAttribute="leading" secondItem="mGE-M4-Bb5" secondAttribute="leading" id="OMw-z5-wKR"/>
+                                            <constraint firstItem="auA-gg-bSP" firstAttribute="centerY" secondItem="Fyc-6G-VpA" secondAttribute="centerY" constant="-0.5" id="rHr-Vo-DNY"/>
                                             <constraint firstAttribute="trailing" secondItem="Fyc-6G-VpA" secondAttribute="trailing" id="tCd-Rh-3Lh"/>
                                         </constraints>
                                         <connections>
+                                            <outlet property="activityIndicator" destination="auA-gg-bSP" id="H8r-cF-HPW"/>
                                             <outlet property="imageView" destination="Fyc-6G-VpA" id="H3F-of-gvK"/>
                                         </connections>
                                     </collectionViewCell>
@@ -102,6 +107,10 @@
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="p7N-O4-P3l"/>
                                 </items>
                             </toolbar>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="kIh-9s-tve" userLabel="Large White Activity Indicator">
+                                <rect key="frame" x="282" y="115" width="37" height="37"/>
+                                <color key="color" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                            </activityIndicatorView>
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="ADi-Gx-Ngp" secondAttribute="trailing" id="8zx-fi-2YQ"/>
@@ -109,12 +118,15 @@
                             <constraint firstItem="vM7-sh-CyZ" firstAttribute="top" secondItem="8Ed-CT-ED9" secondAttribute="bottom" constant="131" id="MgW-Gn-kof"/>
                             <constraint firstItem="vM7-sh-CyZ" firstAttribute="leading" secondItem="n8s-lX-Cg0" secondAttribute="leading" id="MhQ-9x-nel"/>
                             <constraint firstAttribute="trailing" secondItem="vM7-sh-CyZ" secondAttribute="trailing" id="eNZ-RE-Jo1"/>
+                            <constraint firstItem="kIh-9s-tve" firstAttribute="top" secondItem="8Ed-CT-ED9" secondAttribute="bottom" constant="51" id="jts-AI-7a6"/>
                             <constraint firstItem="6nt-W2-Ln9" firstAttribute="top" secondItem="ADi-Gx-Ngp" secondAttribute="bottom" id="m50-8K-iYm"/>
+                            <constraint firstAttribute="centerX" secondItem="kIh-9s-tve" secondAttribute="centerX" constant="-0.5" id="nPf-MY-vlm"/>
                             <constraint firstItem="6nt-W2-Ln9" firstAttribute="top" secondItem="vM7-sh-CyZ" secondAttribute="bottom" id="sNb-DH-ka8"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="tfz-bC-se4"/>
                     <connections>
+                        <outlet property="activityIndicator" destination="kIh-9s-tve" id="8eS-6O-fNe"/>
                         <outlet property="bottomButton" destination="f2g-WL-CFB" id="Pjo-g9-0Jm"/>
                         <outlet property="collectionView" destination="vM7-sh-CyZ" id="BRY-rT-rnF"/>
                     </connections>

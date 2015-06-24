@@ -41,7 +41,38 @@ extension MapViewController: MKMapViewDelegate {
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "SeguePhoto" {
             let photoCollectionController = segue.destinationViewController.topViewController as! PhotoCollectionViewController
-            photoCollectionController.pin = sender as! MapPin
+            let pin = sender as! MapPin
+            photoCollectionController.pin = pin
+            
+            // TODO: prefetch photos
+            prefetchPhotosForPin(pin)
+        }
+    }
+    
+    func prefetchPhotosForPin(pin: MapPin) {
+        
+        if pin.photos.isEmpty {
+            
+            VTClient.sharedInstance().getPhotosFromCoordinate(pin.coordinate, completionHandler: { (result, error) -> Void in
+                if let error = error {
+                    println("Error: In MapView")
+                } else {
+                    println("Result: \(result)")
+                    
+                    // TODO: parse result, create Photo object and insert into context. Establish relationship to selected MapPin
+                    let photosArray = result!
+                    var photos = photosArray.map() { (dictionary: [String : AnyObject]) -> Photo in
+                        let photo = Photo(dictionary: dictionary, context: self.sharedContext)
+                        // establish relationship with photo to selected pin
+                        photo.pin = pin
+                        
+                        
+                        return photo
+                    }
+                    
+                }
+            })
+            CoreDataStackManager.sharedInstance().saveContext()
         }
     }
     
@@ -53,6 +84,7 @@ extension MapViewController: MKMapViewDelegate {
     }
     
     func mapView(mapView: MKMapView!, regionDidChangeAnimated animated: Bool) {
+        println("Region did changed")
         // remember the last map region
         let mapCenterLat = mapView.region.center.latitude
         let mapCenterLong = mapView.region.center.longitude
