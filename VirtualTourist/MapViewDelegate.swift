@@ -14,15 +14,23 @@ extension MapViewController: MKMapViewDelegate {
     func mapView(mapView: MKMapView!, viewForAnnotation annotation: MKAnnotation!) -> MKAnnotationView! {
         if let annotation = annotation as? MapPin {
             let identifier = "pin"
-            var view: MKAnnotationView
+            var view: MKPinAnnotationView
             if let dequeuedView = mapView.dequeueReusableAnnotationViewWithIdentifier(identifier) as? MKPinAnnotationView {
                 dequeuedView.annotation = annotation
                 view = dequeuedView
             } else {
                 view = MKPinAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+                view.draggable = true
+                view.animatesDrop = true
                 view.canShowCallout = true
                 view.calloutOffset = CGPoint(x: -5, y: 5)
-                view.rightCalloutAccessoryView = UIButton.buttonWithType(UIButtonType.DetailDisclosure) as! UIView
+                view.rightCalloutAccessoryView = UIButton.buttonWithType(UIButtonType.DetailDisclosure) as! UIButton
+                
+                let deleteButton = UIButton.buttonWithType(UIButtonType.System) as! UIButton
+                deleteButton.setTitle("Delete", forState: UIControlState.Normal)
+                view.leftCalloutAccessoryView = deleteButton
+                
+                
             }
             return view
         }
@@ -44,7 +52,7 @@ extension MapViewController: MKMapViewDelegate {
             let pin = sender as! MapPin
             photoCollectionController.pin = pin
             
-            // TODO: prefetch photos
+            // prefetch photos
             prefetchPhotosForPin(pin)
         }
     }

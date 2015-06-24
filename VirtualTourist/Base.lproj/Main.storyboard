@@ -18,18 +18,28 @@
                         <subviews>
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="nhG-lv-c9c">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                                <connections>
+                                    <outlet property="delegate" destination="vXZ-lx-hvc" id="4p6-gr-One"/>
+                                </connections>
                             </mapView>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="dQa-5s-pEG">
+                                <rect key="frame" x="282" y="281" width="37" height="37"/>
+                                <color key="color" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                            </activityIndicatorView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="nhG-lv-c9c" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="61z-f8-BQz"/>
                             <constraint firstItem="nhG-lv-c9c" firstAttribute="top" secondItem="kh9-bI-dsS" secondAttribute="top" id="Dga-1M-YTQ"/>
+                            <constraint firstItem="dQa-5s-pEG" firstAttribute="centerY" secondItem="nhG-lv-c9c" secondAttribute="centerY" constant="-0.5" id="Ku6-0z-rly"/>
                             <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="nhG-lv-c9c" secondAttribute="bottom" id="ZLu-Jl-BWq"/>
+                            <constraint firstItem="dQa-5s-pEG" firstAttribute="centerX" secondItem="nhG-lv-c9c" secondAttribute="centerX" constant="0.5" id="vgH-Fl-zt7"/>
                             <constraint firstAttribute="trailing" secondItem="nhG-lv-c9c" secondAttribute="trailing" id="ysB-pN-aMw"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="DaF-0n-wg6"/>
                     <connections>
+                        <outlet property="activityIndicator" destination="dQa-5s-pEG" id="l4i-5c-gil"/>
                         <outlet property="mapView" destination="nhG-lv-c9c" id="z5j-uV-1PD"/>
                         <segue destination="ftp-2n-cN2" kind="presentation" identifier="SeguePhoto" modalPresentationStyle="overCurrentContext" modalTransitionStyle="crossDissolve" id="1IY-gN-sHl"/>
                     </connections>
@@ -51,7 +61,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="vM7-sh-CyZ">
-                                <rect key="frame" x="0.0" y="195" width="600" height="405"/>
+                                <rect key="frame" x="0.0" y="195" width="600" height="361"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="1" minimumInteritemSpacing="1" id="6Av-1Y-sut">
                                     <size key="itemSize" width="200" height="200"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
@@ -117,11 +127,11 @@
                             <constraint firstItem="ADi-Gx-Ngp" firstAttribute="leading" secondItem="n8s-lX-Cg0" secondAttribute="leading" id="Kf6-ww-Inz"/>
                             <constraint firstItem="vM7-sh-CyZ" firstAttribute="top" secondItem="8Ed-CT-ED9" secondAttribute="bottom" constant="131" id="MgW-Gn-kof"/>
                             <constraint firstItem="vM7-sh-CyZ" firstAttribute="leading" secondItem="n8s-lX-Cg0" secondAttribute="leading" id="MhQ-9x-nel"/>
+                            <constraint firstItem="ADi-Gx-Ngp" firstAttribute="top" secondItem="vM7-sh-CyZ" secondAttribute="bottom" id="SGJ-05-JLo"/>
                             <constraint firstAttribute="trailing" secondItem="vM7-sh-CyZ" secondAttribute="trailing" id="eNZ-RE-Jo1"/>
                             <constraint firstItem="kIh-9s-tve" firstAttribute="top" secondItem="8Ed-CT-ED9" secondAttribute="bottom" constant="51" id="jts-AI-7a6"/>
                             <constraint firstItem="6nt-W2-Ln9" firstAttribute="top" secondItem="ADi-Gx-Ngp" secondAttribute="bottom" id="m50-8K-iYm"/>
                             <constraint firstAttribute="centerX" secondItem="kIh-9s-tve" secondAttribute="centerX" constant="-0.5" id="nPf-MY-vlm"/>
-                            <constraint firstItem="6nt-W2-Ln9" firstAttribute="top" secondItem="vM7-sh-CyZ" secondAttribute="bottom" id="sNb-DH-ka8"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="tfz-bC-se4"/>

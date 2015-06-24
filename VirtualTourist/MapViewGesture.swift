@@ -22,6 +22,7 @@ extension MapViewController {
         switch sender.state {
         case .Began:
             println("Gesture began")
+            self.activityIndicator.startAnimating()
         case .Ended:
             self.getCoordinateFromPoint(sender)
         default:
@@ -62,6 +63,9 @@ extension MapViewController {
         self.getLocationFromCoordinate(coordinate, withCompletion: { (location, error) -> () in
             if let error = error {
                 println("Error getting location \(error)")
+                if self.activityIndicator.isAnimating() {
+                    self.activityIndicator.stopAnimating()
+                }
             } else {
                 println("Location: \(location)")
                 
@@ -69,6 +73,9 @@ extension MapViewController {
                 let title = location!
                 // create the annotation from coordinate
                 self.addAnnotationToCoordinate(coordinate, location: title)
+                if self.activityIndicator.isAnimating() {
+                    self.activityIndicator.stopAnimating()
+                }
             }
         })
         
@@ -92,5 +99,17 @@ extension MapViewController {
         
         // show the new pin on the map
         self.mapView.addAnnotation(pin)
+        
+        // center map on pin
+        centerMapOnPin(pin)
+    }
+    
+    func centerMapOnPin(pin: MapPin) {
+        
+        let center = CLLocationCoordinate2DMake(pin.coordinate.latitude, pin.coordinate.longitude)
+        let span = MKCoordinateSpanMake(5.0, 5.0)
+        let region = MKCoordinateRegionMake(center, span)
+        
+        self.mapView.setRegion(region, animated: true)
     }
 }

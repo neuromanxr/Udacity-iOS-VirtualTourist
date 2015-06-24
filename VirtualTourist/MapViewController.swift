@@ -14,6 +14,8 @@ class MapViewController: UIViewController {
     
     @IBOutlet weak var mapView: MKMapView!
     
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    
     var gesture = UILongPressGestureRecognizer()
     
     var pins = [MapPin]()
@@ -29,7 +31,7 @@ class MapViewController: UIViewController {
         
         self.loadMapDefaults()
         
-        self.mapView.delegate = self
+//        self.mapView.delegate = self
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -41,6 +43,10 @@ class MapViewController: UIViewController {
         super.viewDidAppear(animated)
         
         self.addGestureRecognizer()
+        
+        if self.activityIndicator.isAnimating() {
+            self.activityIndicator.stopAnimating()
+        }
     }
     
     override func viewDidDisappear(animated: Bool) {
@@ -58,8 +64,15 @@ class MapViewController: UIViewController {
         let error = NSErrorPointer()
         let fetchRequest = NSFetchRequest(entityName: "MapPin")
 //        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "", ascending: true)]
-        let mapPins = self.sharedContext.executeFetchRequest(fetchRequest, error: error)
-        println("Map Pins \(mapPins?.count)")
+        let mapPins = self.sharedContext.executeFetchRequest(fetchRequest, error: error) as! [MapPin]
+        println("Map Pins \(mapPins.count)")
+        
+//        var mapPinsArray = [MKAnnotationView]()
+//        for pin in mapPins {
+//            var pinView = MKAnnotationView()
+//            pinView.annotation = pin
+//            mapPinsArray.append(pinView)
+//        }
         
         // then show the pins on the map
         self.mapView.addAnnotations(mapPins)
