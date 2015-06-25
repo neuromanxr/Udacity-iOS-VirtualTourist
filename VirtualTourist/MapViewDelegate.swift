@@ -27,7 +27,8 @@ extension MapViewController: MKMapViewDelegate {
                 view.rightCalloutAccessoryView = UIButton.buttonWithType(UIButtonType.DetailDisclosure) as! UIButton
                 
                 let deleteButton = UIButton.buttonWithType(UIButtonType.System) as! UIButton
-                deleteButton.setTitle("Delete", forState: UIControlState.Normal)
+                deleteButton.frame = CGRectMake(0, 0, 20, 20)
+                deleteButton.setImage(UIImage(named: "deleteIcon"), forState: UIControlState.Normal)
                 view.leftCalloutAccessoryView = deleteButton
                 
                 
@@ -43,7 +44,7 @@ extension MapViewController: MKMapViewDelegate {
         // get the pin selected
         let pin = view.annotation as! MapPin
         
-        self.performSegueWithIdentifier("SeguePhoto", sender: pin)
+        centerMapOnPin(pin)
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -65,9 +66,8 @@ extension MapViewController: MKMapViewDelegate {
                 if let error = error {
                     println("Error: In MapView")
                 } else {
-                    println("Result: \(result)")
+                    println("Result: \(result?.count)")
                     
-                    // TODO: parse result, create Photo object and insert into context. Establish relationship to selected MapPin
                     let photosArray = result!
                     var photos = photosArray.map() { (dictionary: [String : AnyObject]) -> Photo in
                         let photo = Photo(dictionary: dictionary, context: self.sharedContext)
@@ -84,11 +84,52 @@ extension MapViewController: MKMapViewDelegate {
         }
     }
     
+    func deletePinLocation(pin: MapPin) {
+        self.mapView.removeAnnotation(pin)
+        self.sharedContext.deleteObject(pin)
+        CoreDataStackManager.sharedInstance().saveContext()
+    }
+    
+    func handlePinDrag(annotation: MKAnnotation) {
+        let pin = annotation as! MapPin
+        for pin in pin.photos {
+            sharedContext.deleteObject(pin)
+        }
+        println("Pin Photos: \(pin.photos.count)")
+        self.prefetchPhotosForPin(pin)
+    }
+    
     func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, calloutAccessoryControlTapped control: UIControl!) {
         // get the annotation tapped
         let pin = view.annotation as? MapPin
         println("Map Pin \(pin?.latitude), \(pin?.longitude)")
+        
+        if control == view.rightCalloutAccessoryView {
+            // Show flickr images on right call out
+            self.performSegueWithIdentifier("SeguePhoto", sender: pin)
+            
+            
+        } else if control == view.leftCalloutAccessoryView {
+            
+            // Delete annotation and location on left call out
+            self.deletePinLocation(pin!)
+        }
 
+    }
+    
+    // Update location when pin is dragged
+    func mapView(mapView: MKMapView!, annotationView view: MKAnnotationView!, didChangeDragState newState: MKAnnotationViewDragState, fromOldState oldState: MKAnnotationViewDragState) {
+
+        switch (newState) {
+        case .Starting:
+            println("Pin dragging")
+        case .Ending, .Canceling:
+            println("Pin dragging ended: \(view.annotation.coordinate.latitude), \(view.annotation.coordinate.longitude)")
+            handlePinDrag(view.annotation)
+            
+        default:
+            break
+        }
     }
     
     func mapView(mapView: MKMapView!, regionDidChangeAnimated animated: Bool) {

@@ -60,8 +60,24 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ADi-Gx-Ngp">
+                                <rect key="frame" x="0.0" y="556" width="600" height="44"/>
+                                <items>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="LRd-Ij-ffw"/>
+                                    <barButtonItem title="Button" id="f2g-WL-CFB">
+                                        <connections>
+                                            <action selector="bottomButtonTapped" destination="Hzj-S4-FmG" id="cGn-Xo-JOb"/>
+                                        </connections>
+                                    </barButtonItem>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="p7N-O4-P3l"/>
+                                </items>
+                            </toolbar>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="kIh-9s-tve" userLabel="Large White Activity Indicator">
+                                <rect key="frame" x="282" y="115" width="37" height="37"/>
+                                <color key="color" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                            </activityIndicatorView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="vM7-sh-CyZ">
-                                <rect key="frame" x="0.0" y="195" width="600" height="361"/>
+                                <rect key="frame" x="0.0" y="206" width="600" height="350"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="1" minimumInteritemSpacing="1" id="6Av-1Y-sut">
                                     <size key="itemSize" width="200" height="200"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
@@ -105,27 +121,11 @@
                                     <outlet property="delegate" destination="Hzj-S4-FmG" id="QaU-mi-ig2"/>
                                 </connections>
                             </collectionView>
-                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ADi-Gx-Ngp">
-                                <rect key="frame" x="0.0" y="556" width="600" height="44"/>
-                                <items>
-                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="LRd-Ij-ffw"/>
-                                    <barButtonItem title="Button" id="f2g-WL-CFB">
-                                        <connections>
-                                            <action selector="bottomButtonTapped" destination="Hzj-S4-FmG" id="cGn-Xo-JOb"/>
-                                        </connections>
-                                    </barButtonItem>
-                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="p7N-O4-P3l"/>
-                                </items>
-                            </toolbar>
-                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="kIh-9s-tve" userLabel="Large White Activity Indicator">
-                                <rect key="frame" x="282" y="115" width="37" height="37"/>
-                                <color key="color" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                            </activityIndicatorView>
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="ADi-Gx-Ngp" secondAttribute="trailing" id="8zx-fi-2YQ"/>
                             <constraint firstItem="ADi-Gx-Ngp" firstAttribute="leading" secondItem="n8s-lX-Cg0" secondAttribute="leading" id="Kf6-ww-Inz"/>
-                            <constraint firstItem="vM7-sh-CyZ" firstAttribute="top" secondItem="8Ed-CT-ED9" secondAttribute="bottom" constant="131" id="MgW-Gn-kof"/>
+                            <constraint firstItem="vM7-sh-CyZ" firstAttribute="top" secondItem="8Ed-CT-ED9" secondAttribute="bottom" constant="142" id="MgW-Gn-kof"/>
                             <constraint firstItem="vM7-sh-CyZ" firstAttribute="leading" secondItem="n8s-lX-Cg0" secondAttribute="leading" id="MhQ-9x-nel"/>
                             <constraint firstItem="ADi-Gx-Ngp" firstAttribute="top" secondItem="vM7-sh-CyZ" secondAttribute="bottom" id="SGJ-05-JLo"/>
                             <constraint firstAttribute="trailing" secondItem="vM7-sh-CyZ" secondAttribute="trailing" id="eNZ-RE-Jo1"/>

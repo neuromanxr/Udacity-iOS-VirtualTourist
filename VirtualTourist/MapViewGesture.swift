@@ -30,8 +30,6 @@ extension MapViewController {
         }
     }
     
-    // TODO: make function for Began state
-    
     func getLocationFromCoordinate(coordinate: CLLocationCoordinate2D, withCompletion completion: (location: String?, error: NSError?) -> ()) {
         
         CLGeocoder().reverseGeocodeLocation(CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude), completionHandler: { (result: [AnyObject]!, error: NSError!) -> Void in
@@ -55,6 +53,7 @@ extension MapViewController {
     }
     
     func getCoordinateFromPoint(sender: UIGestureRecognizer) {
+        
         // get the coordinate from the user touch
         let point = sender.locationInView(self.mapView)
         let coordinate = self.mapView.convertPoint(point, toCoordinateFromView: self.mapView)

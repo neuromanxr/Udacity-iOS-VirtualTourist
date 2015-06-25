@@ -46,7 +46,6 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
         
         // Navigation Buttons
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Done, target: self, action: "dismiss")
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Cancel, target: self, action: "dismiss")
         
         // Bottom Button
         self.bottomButton.enabled = false
@@ -152,21 +151,22 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
         }
         cell.imageView?.image = cellImage
         
+        // stop activity indicators
         if cell.activityIndicator.isAnimating() {
             cell.activityIndicator.stopAnimating()
+        }
+        
+        if self.activityIndicator.isAnimating() {
+            self.activityIndicator.stopAnimating()
         }
         
         // If the cell is "selected" it's color panel is grayed out
         // we use the Swift `find` function to see if the indexPath is in the array
         
         if let index = find(selectedIndexes, indexPath) {
-            cell.imageView?.alpha = 0.5
+            cell.imageView?.alpha = 0.2
         } else {
             cell.imageView?.alpha = 1.0
-        }
-        
-        if self.activityIndicator.isAnimating() {
-            self.activityIndicator.stopAnimating()
         }
     }
 
@@ -307,9 +307,12 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
     
     func getNewPhotoCollection() {
         
-        self.activityIndicator.startAnimating()
         println("Get New: \(pin.photos.count)")
         if pin.photos.isEmpty {
+            
+            if !self.activityIndicator.isAnimating() {
+                self.activityIndicator.startAnimating()
+            }
             
             VTClient.sharedInstance().getPhotosFromCoordinate(pin.coordinate, completionHandler: { (result, error) -> Void in
                 if let error = error {
@@ -317,7 +320,6 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
                 } else {
                     println("Result: \(result)")
                     
-                    // TODO: parse result, create Photo object and insert into context. Establish relationship to selected MapPin
                     let photosArray = result!
                     var photos = photosArray.map() { (dictionary: [String : AnyObject]) -> Photo in
                         let photo = Photo(dictionary: dictionary, context: self.sharedContext)
@@ -387,12 +389,14 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
         } else {
             // all photos are finished downloading
             bottomButton.enabled = true
+            
         }
     }
     
     func updateBottomButton() {
         if selectedIndexes.count > 0 {
             bottomButton.title = "Remove Selected Photos"
+            bottomButton.enabled = true
         } else {
             bottomButton.title = "New Collection"
             

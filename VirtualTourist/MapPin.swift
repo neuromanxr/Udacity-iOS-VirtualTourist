@@ -25,13 +25,22 @@ class MapPin: NSManagedObject, MKAnnotation {
     @NSManaged var longitude: NSNumber
     @NSManaged var photos: [Photo]
     
+    var locationCoordinate = CLLocationCoordinate2D()
+    
     var coordinate: CLLocationCoordinate2D {
         get {
-            var coordinate = CLLocationCoordinate2D()
-            coordinate.latitude = self.latitude.doubleValue
-            coordinate.longitude = self.longitude.doubleValue
-            return coordinate
+            locationCoordinate = CLLocationCoordinate2DMake(self.latitude.doubleValue, self.longitude.doubleValue)
+            
+            return locationCoordinate
         }
+    }
+    
+    func setCoordinate(newCoordinate: CLLocationCoordinate2D) {
+        self.latitude = newCoordinate.latitude
+        self.longitude = newCoordinate.longitude
+        
+        locationCoordinate = newCoordinate
+        println("New Coordinate: \(newCoordinate.latitude), \(newCoordinate.longitude)")
     }
     
     init(dictionary: [String : AnyObject], context: NSManagedObjectContext) {
