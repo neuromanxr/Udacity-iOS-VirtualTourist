@@ -116,11 +116,12 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
         cell.imageView?.image = nil
         
         if photo.image != nil {
+            // set the cell image if there's already a photo
             cellImage = photo.image
         } else {
-            
+            // start the activity indicator
             cell.activityIndicator.startAnimating()
-            
+            // download the image for each cell
             let task = VTClient.sharedInstance().taskForImage(photo.link!, completionHandler: { (imageData, error) -> Void in
                 if let error = error {
                     println("Error: taskForImage call")
@@ -128,15 +129,14 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
                 } else {
                     
                     if let data = imageData {
+                        // create the image and save it
                         let image = UIImage(data: data)
                         photo.image = image
-                        
+                        // update the UI
                         dispatch_async(dispatch_get_main_queue(), { () -> Void in
                             cell.activityIndicator.stopAnimating()
                             cell.imageView?.image = image
                             photo.isDownloaded = true
-                            
-                            
                             
                             self.updateBottomButton()
                         })
