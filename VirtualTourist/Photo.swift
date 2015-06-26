@@ -16,12 +16,11 @@ class Photo: NSManagedObject {
     struct Keys {
         static let Link = "url_m"
         static let Downloaded = "isDownloaded"
-//        static let Image = "Image"
+
     }
     
     @NSManaged var link: String?
     @NSManaged var isDownloaded: Bool
-//    @NSManaged var imageData: NSData?
     @NSManaged var pin: MapPin?
     
     init(dictionary: [String: AnyObject], context: NSManagedObjectContext) {
@@ -31,8 +30,6 @@ class Photo: NSManagedObject {
         
         self.link = dictionary[Keys.Link] as? String
         self.isDownloaded = false
-//        self.inAlbum = dictionary[Keys.InAlbum] as! Bool
-//        self.imageData = dictionary[Keys.Image] as! NSData
     }
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {

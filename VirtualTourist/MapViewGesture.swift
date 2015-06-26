@@ -39,11 +39,17 @@ extension MapViewController {
                 
             } else {
                 let placemark = result.first as! CLPlacemark
+                var location = String()
+                
                 let addressDictionary = placemark.addressDictionary
-                let locationCity = addressDictionary["City"] as! String
-                let locationCountry = addressDictionary["Country"] as! String
-//                let location = "\(locationCountry)"
-                let location = "\(locationCity), \(locationCountry)"
+                if let locationCountry = addressDictionary["Country"] as? String {
+                    location = "\(locationCountry)"
+                    if let locationCity = addressDictionary["City"] as? String {
+                        
+                        location = "\(locationCity), \(locationCountry)"
+                        println("Location: \(location)")
+                    }
+                }
                 
                 println("address dictionary \(addressDictionary)")
                 // call completion

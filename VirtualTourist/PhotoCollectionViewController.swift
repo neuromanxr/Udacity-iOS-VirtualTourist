@@ -125,6 +125,7 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
             let task = VTClient.sharedInstance().taskForImage(photo.link!, completionHandler: { (imageData, error) -> Void in
                 if let error = error {
                     println("Error: taskForImage call")
+                    cellImage = UIImage(named: "noImage")
 
                 } else {
                     
