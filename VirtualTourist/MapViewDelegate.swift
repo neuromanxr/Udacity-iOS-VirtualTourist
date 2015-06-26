@@ -92,6 +92,13 @@ extension MapViewController: MKMapViewDelegate {
     
     func handlePinDrag(annotation: MKAnnotation) {
         let pin = annotation as! MapPin
+        getLocationFromCoordinate(pin.coordinate, withCompletion: { (location, error) -> () in
+            if let error = error {
+                println("Error: Getting location from coordinate")
+            } else {
+                pin.title = location!
+            }
+        })
         for pin in pin.photos {
             sharedContext.deleteObject(pin)
         }
@@ -111,8 +118,18 @@ extension MapViewController: MKMapViewDelegate {
             
         } else if control == view.leftCalloutAccessoryView {
             
-            // Delete annotation and location on left call out
-            self.deletePinLocation(pin!)
+            let alertController = UIAlertController(title: "Delete", message: "Delete pin?", preferredStyle: UIAlertControllerStyle.Alert)
+            let alertActionOK = UIAlertAction(title: "OK", style: UIAlertActionStyle.Destructive, handler: { (actionOK) -> Void in
+                // Delete annotation and location on left call out
+                self.deletePinLocation(pin!)
+            })
+            let alertActionCancel = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default, handler: { (actionCancel) -> Void in
+                println("Cancelled")
+            })
+            alertController.addAction(alertActionOK)
+            alertController.addAction(alertActionCancel)
+            
+            self.presentViewController(alertController, animated: true, completion: nil)
         }
 
     }
