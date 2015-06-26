@@ -112,7 +112,7 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
         
         let photo = self.fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
         var cellImage = UIImage(named: "placeholder")
-        println("Pin Image \(cellImage!)")
+
         cell.imageView?.image = nil
         
         if photo.image != nil {
@@ -297,7 +297,7 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
             }
             
             for indexPath in self.updatedIndexPaths {
-                // TODO: Causes infinite loop with photo.isDownloaded
+                // TODO: Causes infinite loop when photo.isDownloaded is set
 //                self.collectionView.reloadItemsAtIndexPaths([indexPath])
             }
             
