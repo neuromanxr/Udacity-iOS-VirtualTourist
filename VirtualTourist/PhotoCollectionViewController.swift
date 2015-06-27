@@ -114,10 +114,10 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
         var cellImage = UIImage(named: "placeholder")
 
         cell.imageView?.image = nil
-        
-        if photo.image != nil {
+
+        if let image = photo.image {
             // set the cell image if there's already a photo
-            cellImage = photo.image
+            cellImage = UIImage(data: image)
         } else {
             // start the activity indicator
             cell.activityIndicator.startAnimating()
@@ -131,12 +131,11 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
                     
                     if let data = imageData {
                         // create the image and save it
-                        let image = UIImage(data: data)
-                        photo.image = image
+                        photo.image = data
                         // update the UI
                         dispatch_async(dispatch_get_main_queue(), { () -> Void in
                             cell.activityIndicator.stopAnimating()
-                            cell.imageView?.image = image
+                            cell.imageView?.image = UIImage(data: data)
                             photo.isDownloaded = true
                             
                             self.updateBottomButton()
@@ -375,6 +374,8 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
         }
         
         selectedIndexes = [NSIndexPath]()
+        
+        CoreDataStackManager.sharedInstance().saveContext()
     }
     
     func checkPhotosIsDownloaded() {
