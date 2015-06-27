@@ -118,6 +118,11 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
         if let image = photo.image {
             // set the cell image if there's already a photo
             cellImage = UIImage(data: image)
+            
+            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                self.updateBottomButton()
+            })
+            
         } else {
             // start the activity indicator
             cell.activityIndicator.startAnimating()
