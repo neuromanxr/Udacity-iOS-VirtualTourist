@@ -266,7 +266,4 @@ class VTClient: NSObject {
         return (!urlVars.isEmpty ? "?" : "") + join("&", urlVars)
     }
     
-    struct Caches {
-        static let imageCache = ImageCache()
-    }
 }

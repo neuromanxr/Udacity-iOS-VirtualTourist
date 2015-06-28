@@ -39,19 +39,4 @@ class Photo: NSManagedObject {
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
     }
-    
-//    override func prepareForDeletion() {
-//        super.prepareForDeletion()
-//        self.image = nil
-//    }
-//    
-//    var image: UIImage? {
-//        get {
-//            return VTClient.Caches.imageCache.imageWithIdentifier(id)
-//        }
-//        
-//        set {
-//            VTClient.Caches.imageCache.storeImage(image, withIdentifier: id!)
-//        }
-//    }
 }
