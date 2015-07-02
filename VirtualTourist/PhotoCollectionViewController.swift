@@ -66,16 +66,6 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
         
         println("Fetched Objects: \(self.fetchedResultsController.fetchedObjects?.count)")
     }
-    
-    override func viewDidAppear(animated: Bool) {
-        super.viewDidAppear(animated)
-        
-    }
-    
-    override func viewWillDisappear(animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -114,12 +104,13 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
         var cellImage = UIImage(named: "placeholder")
 
         cell.imageView?.image = nil
-
+        
         if let image = photo.image {
             // set the cell image if there's already a photo
-            cellImage = UIImage(data: image)
+            cellImage = image
             
             dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                self.checkPhotosIsDownloaded()
                 self.updateBottomButton()
             })
             
@@ -136,7 +127,7 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
                     
                     if let data = imageData {
                         // create the image and save it
-                        photo.image = data
+                        photo.image = UIImage(data: data)
                         // update the UI
                         dispatch_async(dispatch_get_main_queue(), { () -> Void in
                             cell.activityIndicator.stopAnimating()
@@ -179,6 +170,7 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
 
     func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
         //#warning Incomplete method implementation -- Return the number of sections
+        println("Section Count \(self.fetchedResultsController.sections?.count)")
         return self.fetchedResultsController.sections?.count ?? 0
     }
 
@@ -362,6 +354,9 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
     func deleteAllPhotos() {
         
         for photo in fetchedResultsController.fetchedObjects as! [Photo] {
+            // delete the files
+            VTClient.Caches.imageCache.deleteImage(photo.image, withIdentifier: photo.id!)
+            // delete Photo from Core Data
             sharedContext.deleteObject(photo)
         }
         CoreDataStackManager.sharedInstance().saveContext()
@@ -371,16 +366,22 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
         var photosToDelete = [Photo]()
         
         for indexPath in selectedIndexes {
-            photosToDelete.append(fetchedResultsController.objectAtIndexPath(indexPath) as! Photo)
+            let photo = fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
+            photosToDelete.append(photo)
+            
         }
         
         for photo in photosToDelete {
+            // delete the selected files
+            VTClient.Caches.imageCache.deleteImage(photo.image, withIdentifier: photo.id!)
+            // delete the selected Photo objects
             sharedContext.deleteObject(photo)
         }
         
         selectedIndexes = [NSIndexPath]()
         
         CoreDataStackManager.sharedInstance().saveContext()
+        
     }
     
     func checkPhotosIsDownloaded() {

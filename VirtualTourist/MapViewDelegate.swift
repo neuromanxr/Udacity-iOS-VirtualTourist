@@ -44,6 +44,9 @@ extension MapViewController: MKMapViewDelegate {
         // get the pin selected
         let pin = view.annotation as! MapPin
         
+        // prefetch photos
+        prefetchPhotosForPin(pin)
+        
         centerMapOnPin(pin)
     }
     
@@ -53,13 +56,12 @@ extension MapViewController: MKMapViewDelegate {
             let pin = sender as! MapPin
             photoCollectionController.pin = pin
             
-            // prefetch photos
-            prefetchPhotosForPin(pin)
+            
         }
     }
     
     func prefetchPhotosForPin(pin: MapPin) {
-        
+        // only fetch if photos is empty
         if pin.photos.isEmpty {
             
             VTClient.sharedInstance().getPhotosFromCoordinate(pin.coordinate, completionHandler: { (result, error) -> Void in
@@ -74,6 +76,19 @@ extension MapViewController: MKMapViewDelegate {
                         // establish relationship with photo to selected pin
                         photo.pin = pin
                         
+                        // fetch photos
+                        VTClient.sharedInstance().taskForImage(photo.link!, completionHandler: { (imageData, error) -> Void in
+                            if let error = error {
+                                println("Prefetch: error")
+                            } else {
+                                if let data = imageData {
+                                    photo.image = UIImage(data: data)
+                                    photo.isDownloaded = true
+                                } else {
+                                    println("Store Image: error")
+                                }
+                            }
+                        })
                         
                         return photo
                     }
@@ -86,6 +101,10 @@ extension MapViewController: MKMapViewDelegate {
     
     func deletePinLocation(pin: MapPin) {
         self.mapView.removeAnnotation(pin)
+        for photo in pin.photos {
+            VTClient.Caches.imageCache.deleteImage(photo.image, withIdentifier: photo.id!)
+        }
+        
         self.sharedContext.deleteObject(pin)
         CoreDataStackManager.sharedInstance().saveContext()
     }

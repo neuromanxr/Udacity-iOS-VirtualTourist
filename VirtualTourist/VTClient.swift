@@ -49,6 +49,12 @@ class VTClient: NSObject {
         return Singleton.sharedInstance
     }
     
+    // MARK: - Shared Image Cache
+    
+    struct Caches {
+        static let imageCache = ImageStore()
+    }
+    
     // Photo grab starts here. Get the page from the photos, then get the image in that page
     func getPhotosFromCoordinate(coordinate: CLLocationCoordinate2D, completionHandler: (result: [[String: AnyObject]]?, error: NSError?) -> Void) {
         

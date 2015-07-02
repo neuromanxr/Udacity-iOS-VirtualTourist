@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		501968561B448E430016C638 /* ImageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501968551B448E430016C638 /* ImageStore.swift */; };
 		50FFDD251B33B71D001E9583 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50FFDD241B33B71D001E9583 /* AppDelegate.swift */; };
 		50FFDD271B33B71D001E9583 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50FFDD261B33B71D001E9583 /* MapViewController.swift */; };
 		50FFDD2A1B33B71D001E9583 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 50FFDD281B33B71D001E9583 /* Main.storyboard */; };
@@ -36,6 +37,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		501968551B448E430016C638 /* ImageStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageStore.swift; sourceTree = "<group>"; };
 		50FFDD1F1B33B71D001E9583 /* VirtualTourist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VirtualTourist.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		50FFDD231B33B71D001E9583 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50FFDD241B33B71D001E9583 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -102,6 +104,7 @@
 				50FFDD571B361222001E9583 /* Constants.swift */,
 				50FFDD4A1B33D867001E9583 /* MapPin.swift */,
 				50FFDD4C1B33F4A9001E9583 /* Photo.swift */,
+				501968551B448E430016C638 /* ImageStore.swift */,
 				50FFDD511B34B6B1001E9583 /* CoreDataStackManager.swift */,
 				50FFDD4E1B33FFDB001E9583 /* Model.xcdatamodeld */,
 				50FFDD261B33B71D001E9583 /* MapViewController.swift */,
@@ -250,6 +253,7 @@
 				50FFDD4B1B33D867001E9583 /* MapPin.swift in Sources */,
 				50FFDD5A1B366462001E9583 /* VTClient.swift in Sources */,
 				50FFDD501B33FFDB001E9583 /* Model.xcdatamodeld in Sources */,
+				501968561B448E430016C638 /* ImageStore.swift in Sources */,
 				50FFDD561B351ADF001E9583 /* MapViewDelegate.swift in Sources */,
 				50FFDD491B33C1AD001E9583 /* PhotoCollectionViewCell.swift in Sources */,
 				50FFDD471B33BBA9001E9583 /* PhotoCollectionViewController.swift in Sources */,

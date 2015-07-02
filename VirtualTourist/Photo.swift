@@ -24,7 +24,6 @@ class Photo: NSManagedObject {
     @NSManaged var link: String?
     @NSManaged var isDownloaded: Bool
     @NSManaged var pin: MapPin?
-    @NSManaged var image: NSData?
     
     init(dictionary: [String: AnyObject], context: NSManagedObjectContext) {
         
@@ -38,5 +37,16 @@ class Photo: NSManagedObject {
     
     override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
+    }
+    
+    var image: UIImage? {
+        get {
+            return VTClient.Caches.imageCache.imageWithIdentifier(id!)
+        }
+        
+        set {
+            // store the image
+            VTClient.Caches.imageCache.storeImage(newValue, withIdentifier: id!)
+        }
     }
 }
