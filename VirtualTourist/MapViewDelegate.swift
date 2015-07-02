@@ -102,7 +102,7 @@ extension MapViewController: MKMapViewDelegate {
     func deletePinLocation(pin: MapPin) {
         self.mapView.removeAnnotation(pin)
         for photo in pin.photos {
-            VTClient.Caches.imageCache.deleteImage(photo.image, withIdentifier: photo.id!)
+            VTClient.Store.imageStore.deleteImage(photo.image, withIdentifier: photo.id!)
         }
         
         self.sharedContext.deleteObject(pin)

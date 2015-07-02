@@ -41,12 +41,12 @@ class Photo: NSManagedObject {
     
     var image: UIImage? {
         get {
-            return VTClient.Caches.imageCache.imageWithIdentifier(id!)
+            return VTClient.Store.imageStore.imageWithIdentifier(id!)
         }
         
         set {
             // store the image
-            VTClient.Caches.imageCache.storeImage(newValue, withIdentifier: id!)
+            VTClient.Store.imageStore.storeImage(newValue, withIdentifier: id!)
         }
     }
 }

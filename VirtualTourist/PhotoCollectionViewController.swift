@@ -355,7 +355,7 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
         
         for photo in fetchedResultsController.fetchedObjects as! [Photo] {
             // delete the files
-            VTClient.Caches.imageCache.deleteImage(photo.image, withIdentifier: photo.id!)
+            VTClient.Store.imageStore.deleteImage(photo.image, withIdentifier: photo.id!)
             // delete Photo from Core Data
             sharedContext.deleteObject(photo)
         }
@@ -373,7 +373,7 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
         
         for photo in photosToDelete {
             // delete the selected files
-            VTClient.Caches.imageCache.deleteImage(photo.image, withIdentifier: photo.id!)
+            VTClient.Store.imageStore.deleteImage(photo.image, withIdentifier: photo.id!)
             // delete the selected Photo objects
             sharedContext.deleteObject(photo)
         }

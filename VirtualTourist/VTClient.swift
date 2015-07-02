@@ -51,8 +51,8 @@ class VTClient: NSObject {
     
     // MARK: - Shared Image Cache
     
-    struct Caches {
-        static let imageCache = ImageStore()
+    struct Store {
+        static let imageStore = ImageStore()
     }
     
     // Photo grab starts here. Get the page from the photos, then get the image in that page
