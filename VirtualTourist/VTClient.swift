@@ -127,7 +127,7 @@ class VTClient: NSObject {
             } else {
                 println("Success in GET call: Get image from page")
                 let photosArray = self.parsePhotoDictionary(result)
-                // TODO: pass photos array to completion
+
                 completionHandler(result: photosArray, error: nil)
             }
         })

@@ -39,20 +39,17 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
         // Do any additional setup after loading the view.
         
         // Navigation Buttons
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Done, target: self, action: "dismiss")
+        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Done, target: self, action: "dismiss")
         
         // Bottom Button
-        self.bottomButton.enabled = false
-        self.bottomButton.title = "New Collection"
+        bottomButton.enabled = false
+        bottomButton.title = "New Collection"
         
         // Start activity indicator
-        self.activityIndicator.startAnimating()
+        activityIndicator.startAnimating()
         
         println("Pin in PhotoCollection: \(self.pin)")
         
@@ -169,7 +166,7 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
     // MARK: UICollectionViewDataSource
 
     func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
-        //#warning Incomplete method implementation -- Return the number of sections
+
         println("Section Count \(self.fetchedResultsController.sections?.count)")
         return self.fetchedResultsController.sections?.count ?? 0
     }
@@ -240,35 +237,35 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
     // We store the incex paths into the three arrays.
     func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
         
-        switch type{
+        switch type {
             
-        case .Insert:
-            println("Insert an item")
-            // Here we are noting that a new Color instance has been added to Core Data. We remember its index path
-            // so that we can add a cell in "controllerDidChangeContent". Note that the "newIndexPath" parameter has
-            // the index path that we want in this case
-            insertedIndexPaths.append(newIndexPath!)
-            break
-        case .Delete:
-            println("Delete an item")
-            // Here we are noting that a Color instance has been deleted from Core Data. We keep remember its index path
-            // so that we can remove the corresponding cell in "controllerDidChangeContent". The "indexPath" parameter has
-            // value that we want in this case.
-            deletedIndexPaths.append(indexPath!)
-            break
-        case .Update:
-            println("Update an item.")
-            // We don't expect Color instances to change after they are created. But Core Data would
-            // notify us of changes if any occured. This can be useful if you want to respond to changes
-            // that come about after data is downloaded. For example, when an images is downloaded from
-            // Flickr in the Virtual Tourist app
-            updatedIndexPaths.append(indexPath!)
-            break
-        case .Move:
-            println("Move an item. We don't expect to see this in this app.")
-            break
-        default:
-            break
+            case .Insert:
+                println("Insert an item")
+                // Here we are noting that a new Color instance has been added to Core Data. We remember its index path
+                // so that we can add a cell in "controllerDidChangeContent". Note that the "newIndexPath" parameter has
+                // the index path that we want in this case
+                insertedIndexPaths.append(newIndexPath!)
+                break
+            case .Delete:
+                println("Delete an item")
+                // Here we are noting that a Color instance has been deleted from Core Data. We keep remember its index path
+                // so that we can remove the corresponding cell in "controllerDidChangeContent". The "indexPath" parameter has
+                // value that we want in this case.
+                deletedIndexPaths.append(indexPath!)
+                break
+            case .Update:
+                println("Update an item.")
+                // We don't expect Color instances to change after they are created. But Core Data would
+                // notify us of changes if any occured. This can be useful if you want to respond to changes
+                // that come about after data is downloaded. For example, when an images is downloaded from
+                // Flickr in the Virtual Tourist app
+                updatedIndexPaths.append(indexPath!)
+                break
+            case .Move:
+                println("Move an item. We don't expect to see this in this app.")
+                break
+            default:
+                break
         }
     }
     
